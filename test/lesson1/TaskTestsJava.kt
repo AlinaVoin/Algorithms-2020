@@ -15,6 +15,7 @@ class TaskTestsJava : AbstractTaskTests() {
     @Tag("4")
     fun testSortAddressesJava() {
         sortAddresses { inputName, outputName -> JavaTasks.sortAddresses(inputName, outputName) }
+
     }
 
     @Test

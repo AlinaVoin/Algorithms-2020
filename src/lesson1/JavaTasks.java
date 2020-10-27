@@ -2,6 +2,12 @@ package lesson1;
 
 import kotlin.NotImplementedError;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+
+import static java.lang.StrictMath.abs;
+
 @SuppressWarnings("unused")
 public class JavaTasks {
     /**
@@ -64,9 +70,74 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
-    static public void sortAddresses(String inputName, String outputName) {
-        throw new NotImplementedError();
-    }
+        // O(N*log(N)) - трудоемкость
+        // O(N) - ресурсоемкость
+        static class Person implements Comparable<Person>{
+            public String street;
+            public String firstName;
+            public String secondName;
+            public int house;
+            public Person(String st, String fn, String sn, int h){
+                street = st;
+                firstName = fn;
+                secondName = sn;
+                house = h;
+            }
+
+            @Override
+            public int compareTo(Person person) {
+                int r = street.compareToIgnoreCase(person.street);
+                if (r != 0) return r;
+                if (house < person.house) return -1;
+                if (house > person.house) return 1;
+                r = secondName.compareToIgnoreCase(person.secondName);
+                if (r !=0) return r;
+                r = firstName.compareToIgnoreCase(person.firstName);
+                return r;
+            }
+        }
+
+        static public void sortAddresses(String inputName, String outputName) throws IOException {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(inputName), StandardCharsets.UTF_8));
+            int total = 0;
+            while (br.readLine() != null) {
+                total++;
+            }
+            br.close();
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(inputName), StandardCharsets.UTF_8));
+            Person[] allPersons = new Person[total];
+            int i = 0;
+            String str = null;
+            while ((str = br.readLine()) != null) {
+                String[] words = str.split(" ");
+                if (words.length != 5){
+                    throw new UnsupportedOperationException("Wrong quantity of string parts");
+                }
+                int h = 0;
+                try{
+                    h = Integer.parseInt(words[4]);
+                }catch (NumberFormatException e){
+                    throw new UnsupportedOperationException("House number is not an integer");
+                }
+                allPersons[i] = new Person(words[3], words[1], words[0], h);
+                i++;
+            }
+            br.close();
+            Arrays.sort(allPersons);
+            PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(outputName), StandardCharsets.UTF_8));
+            for (int k = 0; k< allPersons.length; k++){
+                if (k==0 || (!allPersons[k].street.equalsIgnoreCase(allPersons[k-1].street) || allPersons[k].house != allPersons[k-1].house)){
+                    if (k > 0){
+                        pw.println();
+                    }
+                    pw.format("%s %d - %s %s", allPersons[k].street, allPersons[k].house, allPersons[k].secondName, allPersons[k].firstName);
+                } else{
+                    pw.format(", %s %s", allPersons[k].secondName, allPersons[k].firstName);
+                }
+            }
+            pw.close();
+        }
+
 
     /**
      * Сортировка температур
@@ -98,10 +169,46 @@ public class JavaTasks {
      * 99.5
      * 121.3
      */
-    static public void sortTemperatures(String inputName, String outputName) {
-        throw new NotImplementedError();
-    }
+    // O(N*log(N)) - трудоемкость
+    // O(N) - ресурсоемкость
+    static public void sortTemperatures(String inputName, String outputName) throws IOException {
 
+        int maxTemp = 5000;
+        int minTemp = - 2730;
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(inputName), StandardCharsets.UTF_8));
+        int total = 0;
+        while (br.readLine() != null) { total++;}
+        br.close();
+
+        br = new BufferedReader(new InputStreamReader(new FileInputStream(inputName), StandardCharsets.UTF_8));
+        int[] temps = new int[total];
+
+        String str;
+        int i = 0;
+        while ((str = br.readLine()) != null) {
+            double num = 0;
+            try {
+                num = Double.parseDouble(str);
+            }catch (NumberFormatException e){ }
+
+            int temp = (int) (num * 10);
+            if(maxTemp>=temp && minTemp <= temp) temps[i] = temp;
+            i++;
+        }
+
+        br.close();
+        Arrays.sort(temps);
+        PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(outputName), StandardCharsets.UTF_8));
+        for (int j =0; j< i; j++){
+            int a = temps[j] / 10;
+            int b = temps[j] % 10;
+            if (temps[j] < 0) pw.write("-");
+            pw.write(abs(a)+"."+abs(b));
+            pw.write("\n");
+        }
+        pw.close();
+    }
     /**
      * Сортировка последовательности
      *
