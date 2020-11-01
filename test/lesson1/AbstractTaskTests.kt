@@ -1,11 +1,13 @@
 package lesson1
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import util.PerfResult
 import util.estimate
-import java.io.BufferedWriter
-import java.io.File
+import java.io.*
+import java.nio.charset.StandardCharsets
 import java.util.*
+import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.abs
 import kotlin.system.measureNanoTime
 
@@ -73,6 +75,33 @@ abstract class AbstractTaskTests : AbstractFileTests() {
         } finally {
             File("temp.txt").delete()
         }
+
+        //mine
+        try {
+            val pw = PrintWriter(OutputStreamWriter(FileOutputStream("test1.txt"), StandardCharsets.UTF_8))
+            val total = 1000000
+            val t1 = System.currentTimeMillis()
+            for (i in 0 until total) {
+                pw.format(
+                    "%s %s - %s %d",
+                    "Smith",
+                    "John",
+                    "Z" + (total - i),
+                    ThreadLocalRandom.current().nextInt(1, 1000)
+                )
+                if (i < total - 1) {
+                    pw.format("\n")
+                }
+            }
+            pw.close()
+            val t2 = System.currentTimeMillis()
+            sortAddresses("test1.txt", "result1.txt")
+            Assertions.assertEquals(t2 - t1 < 10000, true)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
 
     private fun generateTemperatures(size: Int): PerfResult<Unit> {
@@ -117,6 +146,28 @@ abstract class AbstractTaskTests : AbstractFileTests() {
             )
         } finally {
             File("temp.txt").delete()
+        }
+
+        //mine
+        try {
+            val pw =
+                PrintWriter(OutputStreamWriter(FileOutputStream("test1.txt"), StandardCharsets.UTF_8))
+            val total = 10000000
+            val t1 = System.currentTimeMillis()
+            for (i in 0 until total) {
+                pw.format(((-274).toDouble() + Math.random() * 774).toString())
+                if (i < total - 1) {
+                    pw.format("\n")
+                }
+            }
+            pw.close()
+            val t2 = System.currentTimeMillis()
+            sortTemperatures("test1.txt", "result1.txt")
+            Assertions.assertEquals(t2 - t1 < 100000, true)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
 
         fun testGeneratedTemperatures(size: Int): PerfResult<Unit> {

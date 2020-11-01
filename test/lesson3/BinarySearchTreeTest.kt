@@ -85,5 +85,4 @@ class BinarySearchTreeTest : AbstractBinarySearchTreeTest() {
     fun tailSetRelationTestJava() {
         doTailSetRelationTest()
     }
-
 }

@@ -82,8 +82,14 @@ public class JavaAlgorithms {
      * Общий комментарий: решение из Википедии для этой задачи принимается,
      * но приветствуется попытка решить её самостоятельно.
      */
+    //O(n) - трудоемкость
+    //О(1) - ресурсоемкость
     static public int josephTask(int menNumber, int choiceInterval) {
-        throw new NotImplementedError();
+        int result = 0;
+        for (int i = 1; i <= menNumber; i++) {
+            result = (result + choiceInterval) % i;
+        }
+        return result + 1;
     }
 
     /**
@@ -97,8 +103,29 @@ public class JavaAlgorithms {
      * Если имеется несколько самых длинных общих подстрок одной длины,
      * вернуть ту из них, которая встречается раньше в строке first.
      */
+    // O(firs.length() * second.length() - трудоемкость
+    // O(firs.length() * second.length() - ресурсоемкость
     static public String longestCommonSubstring(String firs, String second) {
-        throw new NotImplementedError();
+
+        int[][] count = new int[firs.length()][second.length()];
+        int maxLength = 0;
+        int maxLengthIndex = 0;
+
+        for (int i = 0; i < firs.length(); i++){
+            for (int j = 0; j < second.length(); j++){
+                if (firs.charAt(i) == second.charAt(j)){
+                    if(i > 0 && j > 0) count[i][j] = count[i-1][j-1] + 1;
+                    else count[i][j] = 1;
+                    if (count[i][j] > maxLength){
+                        maxLength = count[i][j];
+                        maxLengthIndex = i;
+                    }
+                }
+            }
+        }
+        if (maxLengthIndex != 0){
+        return firs.substring(maxLengthIndex - maxLength + 1,  maxLengthIndex + 1);}
+        else return "";
     }
 
     /**
@@ -111,7 +138,24 @@ public class JavaAlgorithms {
      * Справка: простым считается число, которое делится нацело только на 1 и на себя.
      * Единица простым числом не считается.
      */
+    //O(n*log(log(n))) - трудоемкость
+    //O(n) - ресурсоемкость
     static public int calcPrimesNumber(int limit) {
-        throw new NotImplementedError();
+        if (limit <= 1) return 0;
+        if (limit <= 2) return 1;
+        boolean[] list = new boolean[limit - 1];
+        for (int i = 0; i < limit - 1; i++) list[i] = true;
+        for (int i = 2; i * i <= limit; i++) {
+            if (list[i-2]){
+                for (int j = i*i; j<=limit; j+=i){
+                    list[j-2] = false;
+                }
+            }
+        }
+        int result = 0;
+        for (int i = 2; i < limit; i++) {
+            if (list[i-2]) result++;
+        }
+        return result;
     }
 }

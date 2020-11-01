@@ -12,6 +12,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
         final T value;
         Node<T> left = null;
         Node<T> right = null;
+        Node<T> parent;
 
         Node(T value) {
             this.value = value;
@@ -84,6 +85,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
             assert closest.right == null;
             closest.right = newNode;
         }
+        newNode.parent = closest;
         size++;
         return true;
     }
@@ -98,12 +100,62 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
      * Спецификация: {@link Set#remove(Object)} (Ctrl+Click по remove)
      *
      * Средняя
+     *
+     *
      */
+    // O(log(n))- трудоемкость
+    // O(n)- ресурсоемкость
+
+    private void swap(Node<T> former, Node<T> present){
+        if (former.parent == null) root = present;
+        else if (former == former.parent.left) former.parent.left = present;
+        else former.parent.right = present;
+        if (present != null) present.parent = former.parent;
+    }
+
+    private Node<T> treeMinimum(Node<T> beginning) {
+        if (beginning == null) return null;
+        while (beginning.left != null) {
+            beginning = beginning.left;
+        }
+        return beginning;
+    }
     @Override
     public boolean remove(Object o) {
-        // TODO
-        throw new NotImplementedError();
+        T t = (T) o;
+        Node<T> removeElement = find(t);
+        if (removeElement == null) return false;
+        if (removeElement.value != t) return false;
+
+        if (removeElement.left == null && removeElement.right == null) {
+            swap(removeElement, null);
+
+        } else if (removeElement.left == null) {
+            swap(removeElement, removeElement.right);
+            removeElement.right.parent = removeElement.parent;
+
+        } else if (removeElement.right == null) {
+            swap(removeElement, removeElement.left);
+            removeElement.left.parent = removeElement.parent;
+        }
+        else {
+            Node<T> minimum = treeMinimum(removeElement.right);
+
+            if (minimum.parent != removeElement) {
+                if (minimum.right == null) minimum.parent.left = null;
+                else swap(minimum, minimum.right);
+                minimum.right = removeElement.right;
+            }
+            swap(removeElement, minimum);
+            removeElement.parent = minimum.parent;
+            minimum.left = removeElement.left;
+            removeElement.left.parent = minimum;
+        }
+        size--;
+        return true;
     }
+
+
 
     @Nullable
     @Override
@@ -118,6 +170,9 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
     }
 
     public class BinarySearchTreeIterator implements Iterator<T> {
+        private int nextIndex;
+        private Node<T> next = treeMinimum(root);
+        private Node<T> current;
 
         private BinarySearchTreeIterator() {
             // Добавьте сюда инициализацию, если она необходима.
@@ -132,11 +187,14 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          * Спецификация: {@link Iterator#hasNext()} (Ctrl+Click по hasNext)
          *
          * Средняя
+         *
+         *
          */
+        // O(1) - трудоемкость
+        // O(1) - русурсоемкость
         @Override
         public boolean hasNext() {
-            // TODO
-            throw new NotImplementedError();
+            return nextIndex != size;
         }
 
         /**
@@ -151,6 +209,7 @@ public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> im
          * Спецификация: {@link Iterator#next()} (Ctrl+Click по next)
          *
          * Средняя
+         *
          */
         @Override
         public T next() {

@@ -119,6 +119,18 @@ abstract class AbstractAlgorithmsTests {
                 File("input/ruslan_ludmila_1.txt").readText(),
                 File("input/ruslan_ludmila_2.txt").readText()
             ).trim()
+
+        )
+        assertEquals(
+            " в",
+            longestCommonSubstring("мы обязательно встретимся слышишь меня прости", "там куда я ухожу весна")
+        )
+        assertEquals(
+            " know ", longestCommonSubstring(
+                "All I'll ever know is life up on a throne\n" +
+                        "Si jak ha myeon kkeuteul boneun geoya\n" +
+                        "You want", "You know I got it like bomb-bomb, blow your mind"
+            )
         )
     }
 
