@@ -70,73 +70,77 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
-        // O(N*log(N)) - трудоемкость
-        // O(N) - ресурсоемкость
-        static class Person implements Comparable<Person>{
-            public String street;
-            public String firstName;
-            public String secondName;
-            public int house;
-            public Person(String st, String fn, String sn, int h){
-                street = st;
-                firstName = fn;
-                secondName = sn;
-                house = h;
-            }
-
-            @Override
-            public int compareTo(Person person) {
-                int r = street.compareToIgnoreCase(person.street);
-                if (r != 0) return r;
-                if (house < person.house) return -1;
-                if (house > person.house) return 1;
-                r = secondName.compareToIgnoreCase(person.secondName);
-                if (r !=0) return r;
-                r = firstName.compareToIgnoreCase(person.firstName);
-                return r;
-            }
+    // O(N*log(N)) - трудоемкость
+    // O(N) - ресурсоемкость
+    static class Person implements Comparable<Person>{
+        public String street;
+        public String firstName;
+        public String secondName;
+        public int house;
+        public Person(String st, String fn, String sn, int h){
+            street = st;
+            firstName = fn;
+            secondName = sn;
+            house = h;
         }
 
-        static public void sortAddresses(String inputName, String outputName) throws IOException {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(inputName), StandardCharsets.UTF_8));
-            int total = 0;
-            while (br.readLine() != null) {
-                total++;
-            }
-            br.close();
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(inputName), StandardCharsets.UTF_8));
-            Person[] allPersons = new Person[total];
-            int i = 0;
-            String str = null;
-            while ((str = br.readLine()) != null) {
-                String[] words = str.split(" ");
-                if (words.length != 5){
-                    throw new UnsupportedOperationException("Wrong quantity of string parts");
-                }
-                int h = 0;
-                try{
-                    h = Integer.parseInt(words[4]);
-                }catch (NumberFormatException e){
-                    throw new UnsupportedOperationException("House number is not an integer");
-                }
-                allPersons[i] = new Person(words[3], words[1], words[0], h);
-                i++;
-            }
-            br.close();
-            Arrays.sort(allPersons);
-            PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(outputName), StandardCharsets.UTF_8));
-            for (int k = 0; k< allPersons.length; k++){
-                if (k==0 || (!allPersons[k].street.equalsIgnoreCase(allPersons[k-1].street) || allPersons[k].house != allPersons[k-1].house)){
-                    if (k > 0){
-                        pw.println();
-                    }
-                    pw.format("%s %d - %s %s", allPersons[k].street, allPersons[k].house, allPersons[k].secondName, allPersons[k].firstName);
-                } else{
-                    pw.format(", %s %s", allPersons[k].secondName, allPersons[k].firstName);
-                }
-            }
-            pw.close();
+        @Override
+        public int compareTo(Person person) {
+            int r = street.compareToIgnoreCase(person.street);
+            if (r != 0) return r;
+            if (house < person.house) return -1;
+            if (house > person.house) return 1;
+            r = secondName.compareToIgnoreCase(person.secondName);
+            if (r !=0) return r;
+            r = firstName.compareToIgnoreCase(person.firstName);
+            return r;
         }
+    }
+
+    static public void sortAddresses(String inputName, String outputName) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(inputName), StandardCharsets.UTF_8));
+        int total = 0;
+        while (br.readLine() != null) {
+            total++;
+        }
+        br.close();
+        br = new BufferedReader(new InputStreamReader(new FileInputStream(inputName), StandardCharsets.UTF_8));
+        Person[] allPersons = new Person[total];
+        int i = 0;
+        String str = null;
+        while ((str = br.readLine()) != null) {
+            String[] words = str.split(" ");
+            if (words.length != 5){
+                throw new UnsupportedOperationException("Wrong quantity of string parts");
+            }
+            int h = 0;
+            try{
+                h = Integer.parseInt(words[4]);
+            }catch (NumberFormatException e){
+                throw new UnsupportedOperationException("House number is not an integer");
+            }
+            allPersons[i] = new Person(words[3], words[1], words[0], h);
+            i++;
+        }
+        br.close();
+        Arrays.sort(allPersons);
+        PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(outputName), StandardCharsets.UTF_8));
+        for (int k = 0; k< allPersons.length; k++){
+            String street = allPersons[k].street;
+            String fName = allPersons[k].firstName;
+            String sName = allPersons[k].secondName;
+            int house = allPersons[k].house;
+            if (k==0 || (!street.equalsIgnoreCase(allPersons[k-1].street) || house != allPersons[k-1].house)){
+                if (k > 0){
+                    pw.println();
+                }
+                pw.format("%s %d - %s %s", street, house, sName, fName);
+            } else{
+                pw.format(", %s %s", sName, fName);
+            }
+        }
+        pw.close();
+    }
 
 
     /**
