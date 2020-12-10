@@ -35,6 +35,23 @@ abstract class AbstractDynamicTests {
                 """.trimIndent()
             ).length, "Answer must have length of $expectedLength2"
         )
+
+        //extra
+        val expectedLength3 = "ion t the j, I sall i y wa (angI like tet o  es, whe te at  sond hane (hat)".length
+        assertEquals(
+            expectedLength3, longestCommonSubSequence(
+                """
+I like going to the jeweler, I put rocks all in my watch (Cha-ching)
+I like texts from my exes, when they want a second chance (What?)
+                """.trimIndent(),
+                """
+Diamond district in the jag (Gang, I said I like it like that)
+Certified, you know I'm gang, gang (Gang, gang I said I like it like)
+Drop the top and blow the brains, wouh (Wouh! I said I like it like that)
+Oh he's so handsome, what's his name? (Yeah, wouh, I said I like it)
+                """.trimIndent()
+            ).length, "Answer must have length of $expectedLength3"
+        )
     }
 
     fun longestIncreasingSubSequence(longestIncreasingSubSequence: (List<Int>) -> List<Int>) {
@@ -52,6 +69,16 @@ abstract class AbstractDynamicTests {
                 listOf(
                     23, 76, 34, 93, 123, 21, 56, 87, 91, 12, 45, 98, 140, 12, 5, 38, 349, 65, 94,
                     45, 76, 15, 99, 100, 88, 84, 35, 88
+                )
+            )
+        )
+
+        //extra
+        assertEquals(
+            listOf(3, 17, 34, 52, 56, 108, 125, 131, 140, 149), longestIncreasingSubSequence(
+                listOf(
+                    3, 17, 34, 52, 23, 56, 108, 132, 146, 30, 125, 27, 103, 142, 99, 84, 131, 15,
+                    95, 140, 25, 138, 149, 105, 2, 98, 123, 82, 65, 67
                 )
             )
         )

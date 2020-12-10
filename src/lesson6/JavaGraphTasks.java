@@ -2,8 +2,7 @@ package lesson6;
 
 import kotlin.NotImplementedError;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class JavaGraphTasks {
@@ -33,8 +32,67 @@ public class JavaGraphTasks {
      * Справка: Эйлеров цикл -- это цикл, проходящий через все рёбра
      * связного графа ровно по одному разу
      */
-    public static List<Graph.Edge> findEulerLoop(Graph graph) {
-        throw new NotImplementedError();
+    // ресурсоемкость - O(V + E)
+    // трудоемкость - O(V*log(V));
+    public static List<Graph.Edge> findEulerLoop(Graph graph){
+        List<Graph.Edge> result = new ArrayList<Graph.Edge>();
+        if (graph.getVertices().size() == 0) return result;
+        var allV = graph.getVertices();
+        int totalOddDegree = 0;
+        Graph.Vertex firstVertex = null;
+        for (var v: allV){
+            if (firstVertex == null) firstVertex = v;
+            var neighbors = graph.getNeighbors(v);
+            if (neighbors.size() % 2 != 0){
+                totalOddDegree++;
+            }
+        }
+        if (totalOddDegree > 2 || totalOddDegree == 1){
+            return result;
+        }
+        ArrayList<Graph.Vertex> path = new ArrayList<>();
+        HashSet<Graph.Edge> currentEdges = new HashSet<>();
+        path.add(firstVertex);
+        boolean success = continueEulerLoop(graph, path, graph.getEdges().size(), currentEdges);
+        if (success){
+            for (int i = 1; i < path.size(); i++){
+                var e = graph.getConnection(path.get(i-1), path.get(i));
+                result.add(e);
+            }
+            var e = graph.getConnection(path.get(path.size()-1), path.get(0));
+            result.add(e);
+            return result;
+        }
+        else{
+            return result;
+        }
+    }
+
+    public static boolean continueEulerLoop(Graph graph, ArrayList<Graph.Vertex> currentPath, int targetEdgeCount, HashSet<Graph.Edge> currentEdges){
+        if (graph.getConnection(currentPath.get(0), currentPath.get(currentPath.size() - 1))!= null){
+            if (currentEdges.size() == targetEdgeCount - 1){
+                return true;
+            }
+        }
+        //обойдем все возможные непосещенные пути
+        var lastV = currentPath.get(currentPath.size() - 1);
+        var neighbors = graph.getNeighbors(lastV);
+        if (neighbors.size() == 0) return false;
+        else{
+            for (var n: neighbors){
+                var e = graph.getConnection(lastV, n);
+                if (e == null) continue;
+                if (currentEdges.contains(e)) continue;
+                currentPath.add(n);
+                currentEdges.add(e);
+                boolean r = continueEulerLoop(graph, currentPath, targetEdgeCount, currentEdges);
+                if (r) return true;
+                //отменить выбор
+                currentPath.remove(currentPath.size()-1);
+                currentEdges.remove(e);
+            }
+            return false;
+        }
     }
 
     /**
@@ -95,9 +153,83 @@ public class JavaGraphTasks {
      *
      * Эта задача может быть зачтена за пятый и шестой урок одновременно
      */
+    // ресурсоемкость - O(V);
+    // трудоемкость - E+ E*log(V) + V*log(V) ->  O(logV(E + V));
     public static Set<Graph.Vertex> largestIndependentVertexSet(Graph graph) {
-        throw new NotImplementedError();
+        HashSet<Graph.Vertex> copyVer = new HashSet<>(graph.getVertices());
+        HashMap<Graph.Vertex, Integer> visitedV = new HashMap<>();
+        ArrayList<Graph.Vertex> vertexList = new ArrayList<>(graph.getVertices());
+        if (checkUnConnected(vertexList, graph)) return graph.getVertices();
+        for (int i =0; i < vertexList.size(); i++){
+            visitedV.put(vertexList.get(i), 0);
+        }
+        if (loopFound(copyVer.iterator().next(), copyVer, visitedV, graph)) throw new IllegalArgumentException();
+
+
+        HashSet<Graph.Vertex> copyV = new HashSet<>(graph.getVertices());
+        HashSet<Graph.Vertex> resultV = new HashSet<>();
+        while (copyV.size() != 0){
+            Graph.Vertex vertex = copyV.iterator().next();
+            resultV.add(vertex);
+            var ns = graph.getConnections(vertex);
+            for (var n: ns.entrySet()){
+                if (n.getValue().getBegin().equals(vertex)){
+                    copyV.remove(n.getValue().getEnd());
+                }
+                else{
+                    copyV.remove(n.getValue().getBegin());
+                }
+            }
+            copyV.remove(vertex);
+        }
+        return resultV;
     }
+
+    public static boolean checkUnConnected(ArrayList<Graph.Vertex> vertexList, Graph graph){
+        boolean ok = true;
+        for (int i =0; i< vertexList.size()-1; i++){
+            for (int j = i+1; j< vertexList.size(); j++){
+                if (graph.getConnection(vertexList.get(i), vertexList.get(j))!= null){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
+    public static boolean loopFound(Graph.Vertex start, Set<Graph.Vertex> copyV, Map<Graph.Vertex, Integer> visitedV, Graph graph){
+        var ns = graph.getConnections(start);
+        for (var n: ns.entrySet()){
+            if (n.getValue().getBegin().equals(start)){
+                if (copyV.contains(n.getValue().getEnd()) && visitedV.get(n.getValue().getEnd()) > 0){
+                    return true;
+                }
+            }
+            else{
+                if (copyV.contains(n.getValue().getBegin()) && visitedV.get(n.getValue().getBegin()) > 0){
+                    return true;
+                }
+            }
+        }
+        copyV.remove(start);
+        for (var n: ns.entrySet()){
+            if (n.getValue().getBegin().equals(start)){
+                if (copyV.contains(n.getValue().getEnd())){
+                    visitedV.put(n.getValue().getEnd(), 1);
+                    return loopFound(n.getValue().getEnd(), copyV, visitedV, graph);
+                }
+            }
+            else {
+                if (copyV.contains(n.getValue().getBegin())) {
+                    visitedV.put(n.getValue().getBegin(), 1);
+                    return loopFound(n.getValue().getBegin(), copyV, visitedV, graph);
+                }
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Наидлиннейший простой путь.

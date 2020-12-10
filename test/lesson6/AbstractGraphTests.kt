@@ -121,6 +121,29 @@ abstract class AbstractGraphTests {
         }.build()
         val loop3 = graph3.findEulerLoop()
         loop3.assert(shouldExist = false, graph = graph3)
+
+        //extra
+        //  A1 ------ B1
+        //  | \ \      |
+        //  |  \  \    |
+        //  |   \   \  |
+        //  E1 --\--- C1
+        //       D1
+        val graph4 = GraphBuilder().apply {
+            val a1 = addVertex("A1")
+            val b1 = addVertex("B1")
+            val c1 = addVertex("C1")
+            val d1 = addVertex("D1")
+            val e1 = addVertex("E1")
+            addConnection(a1, b1)
+            addConnection(a1, c1)
+            addConnection(a1, d1)
+            addConnection(a1, e1)
+            addConnection(b1, c1)
+            addConnection(c1, e1)
+        }.build()
+        val loop4 = graph4.findEulerLoop()
+        loop4.assert(shouldExist = true, graph = graph4)
     }
 
     fun minimumSpanningTree(minimumSpanningTree: Graph.() -> Graph) {
@@ -257,6 +280,42 @@ abstract class AbstractGraphTests {
         assertEquals(
             setOf(cross["A"], cross["B"], cross["C"], cross["D"]),
             cross.largestIndependentVertexSet()
+        )
+
+        //extra
+        //                 C
+        //              /  |  \
+        //           /     |    \
+        // A ----- B ----- | ----- D
+        // |    /  |       |       |
+        // |  /    |       |       |
+        // H ----- F ----- E ----- G
+
+        val figure = GraphBuilder().apply {
+            val a = addVertex("A")
+            val b = addVertex("B")
+            val c = addVertex("C")
+            val d = addVertex("D")
+            val e = addVertex("E")
+            val f = addVertex("F")
+            val g = addVertex("G")
+            val h = addVertex("H")
+            addConnection(a, b)
+            addConnection(a, h)
+            addConnection(b, c)
+            addConnection(b, d)
+            addConnection(b, f)
+            addConnection(b, h)
+            addConnection(c, d)
+            addConnection(c, e)
+            addConnection(d, g)
+            addConnection(e, f)
+            addConnection(e, g)
+            addConnection(f, h)
+        }.build()
+        assertEquals(
+            setOf(figure["A"], figure["C"], figure["F"], figure["G"]),
+            figure.largestIndependentVertexSet()
         )
     }
 

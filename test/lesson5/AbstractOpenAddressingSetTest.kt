@@ -76,6 +76,22 @@ abstract class AbstractOpenAddressingSetTest {
                 )
             }
         }
+
+        //extra
+        val controlSet =
+            mutableSetOf<String>("green", "red", "blue", "yellow", "white", "monday", "black")
+        var toRemove = "monday"
+        val colorsSet = create<String>(7)
+        for (element in controlSet) {
+            colorsSet += element
+        }
+        val expectedSize = colorsSet.size - 1
+
+        assertTrue(toRemove in colorsSet)
+        assertTrue(colorsSet.remove(toRemove))
+        assertFalse(toRemove in colorsSet)
+        assertEquals(expectedSize, colorsSet.size)
+        assertFalse(colorsSet.remove(toRemove))
     }
 
     protected fun doIteratorTest() {
@@ -117,6 +133,34 @@ abstract class AbstractOpenAddressingSetTest {
                 openAddressingSetIter.next()
             }
             println("All clear!")
+        }
+
+        //extra
+        val controlSet = mutableSetOf("", " ", "   ", "    ", "     ")
+
+        println("Control set: $controlSet")
+        val openAddressingSet = create<String>(random.nextInt(7) + 3)
+
+        assertFalse(openAddressingSet.iterator().hasNext())
+
+        for (element in controlSet) {
+            openAddressingSet += element
+        }
+        val openAddressingSetIterator = openAddressingSet.iterator()
+        while (openAddressingSetIterator.hasNext()) {
+            controlSet.remove(openAddressingSetIterator.next())
+        }
+
+        assertTrue(controlSet.isEmpty())
+        assertFailsWith<IllegalStateException>("Something was returned after all elements ended") {
+            openAddressingSetIterator.next()
+        }
+
+        val iterator1 = openAddressingSet.iterator()
+        val iterator2 = openAddressingSet.iterator()
+
+        while (iterator1.hasNext()) {
+            assertEquals(iterator2.next(), iterator1.next())
         }
     }
 
@@ -174,6 +218,40 @@ abstract class AbstractOpenAddressingSetTest {
                 )
             }
             println("All clear!")
+        }
+
+        //extra
+        val controlSet =
+            mutableSetOf<String>("green", "red", "blue", "yellow", "white", "monday", "black")
+        var toRemove = "monday"
+        val openAddressingSet = create<String>(7)
+        for (element in controlSet) {
+            openAddressingSet += element
+        }
+        controlSet.remove(toRemove)
+        val iterator = openAddressingSet.iterator()
+
+        assertFailsWith<IllegalStateException>() {
+            iterator.remove()
+        }
+
+        var counter = openAddressingSet.size
+        while (iterator.hasNext()) {
+            val element = iterator.next()
+            counter--
+            if (element == toRemove) {
+                iterator.remove()
+            }
+        }
+
+        assertEquals(controlSet.size, openAddressingSet.size)
+        assertEquals(0, counter)
+
+        for (element in controlSet) {
+            assertTrue(openAddressingSet.contains(element))
+        }
+        for (element in openAddressingSet) {
+            assertTrue(controlSet.contains(element))
         }
     }
 }

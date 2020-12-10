@@ -41,15 +41,16 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
     @Override
     public boolean contains(Object o) {
         int index = startingIndex(o);
-        Object current = storage[index];
-        while (current != null) {
-            if (current.equals(o)) {
+        int startIndex = index;
+        while (true) {
+            if (storage[index] != null && storage[index].equals(o)) {
                 return true;
             }
             index = (index + 1) % capacity;
-            current = storage[index];
+            if (index == startIndex){
+                return false;
+            }
         }
-        return false;
     }
 
     /**
@@ -93,9 +94,25 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
      *
      * Средняя
      */
+    //ресурсоемкость - O(1);
+    //трудоемкость - O(N) - худший случай;
     @Override
     public boolean remove(Object o) {
-        return super.remove(o);
+        if (size == 0) return false;
+        int startIndex = startingIndex(o);
+        int k = startIndex;
+        while (storage[k]!= null){
+            if (storage[k].equals(o)){
+                storage[k] = null;
+                size--;
+                return true;
+            }
+            else{
+                k = (k+1) % capacity;
+                if (k == startIndex) return false;
+            }
+        }
+        return false;
     }
 
     /**
@@ -108,10 +125,44 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
      *
      * Средняя (сложная, если поддержан и remove тоже)
      */
+    //ресурсоемкость - O(1);
+    //трудоемкость - O(N) худший случай;
+
     @NotNull
     @Override
     public Iterator<T> iterator() {
-        // TODO
-        throw new NotImplementedError();
+        return new Iterator<T>(){
+            int currentIndex = 0;
+
+            @Override
+            public boolean hasNext() {
+                    while (currentIndex < capacity && storage[currentIndex] == null){
+                        currentIndex++;
+                    }
+                    return currentIndex < capacity;
+            }
+
+            @Override
+            public T next() {
+                while (currentIndex < capacity && storage[currentIndex] == null){
+                    currentIndex++;
+                }
+                if (currentIndex < capacity) return (T) storage[currentIndex++];
+                else throw new IllegalStateException();
+            }
+
+            @Override
+            public void remove() {
+                int k = currentIndex - 1;
+                while (k >= 0 && storage[k] == null){
+                    k--;
+                }
+                if (k < 0) throw new IllegalStateException();
+                else{
+                    storage[k] = null;
+                    size--;
+                }
+            }
+        };
     }
 }

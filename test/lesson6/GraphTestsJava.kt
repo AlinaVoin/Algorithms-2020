@@ -4,6 +4,13 @@ import org.junit.jupiter.api.Tag
 import kotlin.test.Test
 
 class GraphTestsJava : AbstractGraphTests() {
+
+    @Test
+    @Tag("8")
+    fun testLargestIndependentVertexSetJava() {
+        largestIndependentVertexSet { let { JavaGraphTasks.largestIndependentVertexSet(it) } }
+    }
+
     @Test
     @Tag("6")
     fun testFindEulerLoopJava() {
@@ -18,12 +25,6 @@ class GraphTestsJava : AbstractGraphTests() {
 
     @Test
     @Tag("8")
-    fun testLargestIndependentVertexSetJava() {
-        largestIndependentVertexSet { let { JavaGraphTasks.largestIndependentVertexSet(it) } }
-    }
-
-    @Test
-    @Tag("8")
     fun testLongestSimplePathJava() {
         longestSimplePath { let { JavaGraphTasks.longestSimplePath(it) } }
     }
@@ -33,4 +34,5 @@ class GraphTestsJava : AbstractGraphTests() {
     fun testBaldaSearcherJava() {
         baldaSearcher { inputName, words -> JavaGraphTasks.baldaSearcher(inputName, words) }
     }
+
 }
